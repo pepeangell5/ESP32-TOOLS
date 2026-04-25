@@ -17,6 +17,9 @@
 #include "BTDisruptor.h"
 #include "BeaconSpam.h"
 #include "Deauther.h"
+#include "EvilPortal.h"
+#include "Screensaver.h"
+#include "ProbeSniffer.h"
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  CARROUSEL PRINCIPAL
@@ -31,7 +34,9 @@ static void handlerWifi() {
     static const char* wifiItems[] = {
         "WiFi Scanner",
         "Beacon Spam",
-        "Deauther"
+        "Deauther",
+        "Evil Portal",
+        "Probe Sniffer"
     };
     static const int wifiCount = sizeof(wifiItems) / sizeof(char*);
 
@@ -39,10 +44,12 @@ static void handlerWifi() {
     while (!exitSub) {
         int choice = runSubMenu("WIFI TOOLS", wifiItems, wifiCount);
         switch (choice) {
-            case -1: exitSub = true;    break;   // < BACK
-            case  0: runWifiScan();     break;
-            case  1: runBeaconSpam();   break;
-            case  2: runDeauther();     break;
+            case -1: exitSub = true;     break;
+            case  0: runWifiScan();      break;
+            case  1: runBeaconSpam();    break;
+            case  2: runDeauther();      break;
+            case  3: runEvilPortal();    break;
+            case  4: runProbeSniffer();  break;
         }
     }
 }
@@ -227,6 +234,7 @@ void runMainMenu() {
     drawCard(currentEntry, 0, false);
 
     unsigned long lastPress = 0;
+    unsigned long lastActivity = millis();   // ← NUEVO: tracking de idle
 
     while (true) {
 
@@ -238,6 +246,7 @@ void runMainMenu() {
             currentEntry = prev;
             drawMainHeader();
             lastPress = millis();
+            lastActivity = millis();              // ← NUEVO
         }
 
         // ── DOWN: tarjeta siguiente (wrap-around) ───────────────────────
@@ -248,6 +257,7 @@ void runMainMenu() {
             currentEntry = next;
             drawMainHeader();
             lastPress = millis();
+            lastActivity = millis();              // ← NUEVO
         }
 
         // ── OK: flash naranja + llamar handler ──────────────────────────
@@ -255,11 +265,11 @@ void runMainMenu() {
             // Flash de selección: 3 pulsos rápidos de color
             for (int i = 0; i < 3; i++) {
                 clearCardArea();
-                drawCard(currentEntry, 0, true);   // naranja
+                drawCard(currentEntry, 0, true);
                 beep(1500 + i * 300, 40);
                 delay(60);
                 clearCardArea();
-                drawCard(currentEntry, 0, false);  // blanco
+                drawCard(currentEntry, 0, false);
                 delay(40);
             }
 
@@ -272,6 +282,21 @@ void runMainMenu() {
             drawMainHeader();
             drawMainFooter();
             drawCard(currentEntry, 0, false);
+            lastPress = millis();
+            lastActivity = millis();              // ← NUEVO
+        }
+
+        // ── SCREENSAVER: si hay 30s sin actividad, lanzar ───────────────
+        if (millis() - lastActivity > SCREENSAVER_IDLE_MS) {
+            runScreensaver();   // bloquea hasta que el usuario presione un botón
+
+            // Al regresar, redibujar el menú entero
+            tft.fillScreen(TFT_BLACK);
+            tft.drawRect(0, 0, 320, 240, UI_MAIN);
+            drawMainHeader();
+            drawMainFooter();
+            drawCard(currentEntry, 0, false);
+            lastActivity = millis();              // resetear idle
             lastPress = millis();
         }
 
