@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ESP32-TOOLS · Web Installer</title>
+<meta name="description" content="Flashea ESP32-TOOLS directamente desde tu navegador. Por PepeAngell." />
+<meta name="theme-color" content="#0a0a0a" />
+
+<!-- Open Graph -->
+<meta property="og:title" content="ESP32-TOOLS · Web Installer" />
+<meta property="og:description" content="Firmware multi-herramienta de seguridad WiFi + Bluetooth para ESP32. Flashea directo desde el navegador." />
+<meta property="og:type" content="website" />
+
+<!-- ESP Web Tools -->
+<script type="module" src="https://unpkg.com/esp-web-tools@10/dist/web/install-button.js?module"></script>
+
+<style>
+:root {
+    --bg:        #0a0a0a;
+    --bg-2:      #111111;
+    --border:    #fa4500;
+    --primary:   #fa4500;
+    --accent:    #ffd700;
+    --text:      #e0e0e0;
+    --text-dim:  #888;
+    --green:     #39ff14;
+    --red:       #ff3030;
+    --cyan:      #00d9ff;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+@font-face {
+    font-family: 'VT323';
+    src: url('https://fonts.gstatic.com/s/vt323/v17/pxiKyp0ihIEF2isfFJU.woff2') format('woff2');
+    font-display: swap;
+}
+
+body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'VT323', 'Courier New', monospace;
+    min-height: 100vh;
+    line-height: 1.4;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Scanline effect en el fondo */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: repeating-linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.15),
+        rgba(0, 0, 0, 0.15) 1px,
+        transparent 1px,
+        transparent 2px
+    );
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* CRT flicker sutil */
+body::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+    pointer-events: none;
+    z-index: 2;
+}
+
+.container {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 20px;
+    position: relative;
+    z-index: 10;
+}
+
+/* TOP BAR */
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 2px solid var(--border);
+    padding: 8px 16px;
+    margin-bottom: 24px;
+    font-size: 22px;
+    background: var(--bg-2);
+}
+
+.topbar-left {
+    color: var(--primary);
+    text-shadow: 0 0 8px var(--primary);
+}
+
+.lang-toggle {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 4px 12px;
+    font-family: inherit;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.lang-toggle:hover {
+    background: var(--primary);
+    color: var(--bg);
+}
+
+/* TERMINAL BLOCK */
+.terminal {
+    border: 2px solid var(--border);
+    background: var(--bg-2);
+    padding: 32px 28px;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.terminal::before {
+    content: '';
+    position: absolute;
+    top: -2px; left: -2px; right: -2px; bottom: -2px;
+    border: 1px solid var(--primary);
+    opacity: 0.3;
+    pointer-events: none;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.3; }
+    50%      { opacity: 0.7; }
+}
+
+.terminal-prompt {
+    color: var(--accent);
+    font-size: 24px;
+    margin-bottom: 8px;
+}
+
+.terminal-prompt::before {
+    content: '> ';
+    color: var(--primary);
+}
+
+/* TÍTULO PRINCIPAL */
+h1.title {
+    font-size: 64px;
+    letter-spacing: 2px;
+    color: var(--primary);
+    text-align: center;
+    margin: 24px 0 8px;
+    text-shadow:
+        0 0 10px var(--primary),
+        0 0 20px var(--primary),
+        2px 2px 0 #000;
+    animation: glitch 8s infinite;
+}
+
+@keyframes glitch {
+    0%, 95%, 100% { transform: translate(0); }
+    96%           { transform: translate(-2px, 1px); }
+    97%           { transform: translate(2px, -1px); }
+    98%           { transform: translate(-1px, -1px); }
+}
+
+.subtitle {
+    text-align: center;
+    color: var(--accent);
+    font-size: 22px;
+    margin-bottom: 32px;
+}
+
+/* MASCOTA ASCII */
+.mascot {
+    text-align: center;
+    color: var(--cyan);
+    font-size: 14px;
+    line-height: 1.1;
+    margin: 16px 0 24px;
+    white-space: pre;
+    text-shadow: 0 0 5px var(--cyan);
+}
+
+/* AVISOS */
+.warnings {
+    margin: 24px 0;
+}
+
+.warnings .line {
+    margin-bottom: 12px;
+    font-size: 22px;
+    color: var(--text);
+}
+
+.warnings .line .bracket {
+    color: var(--accent);
+    font-weight: bold;
+}
+
+.warnings .line strong {
+    color: var(--green);
+    text-shadow: 0 0 5px var(--green);
+}
+
+/* BOTÓN INSTALAR */
+.install-section {
+    text-align: center;
+    margin: 32px 0;
+}
+
+esp-web-install-button {
+    --esp-tools-button-color: var(--bg);
+    --esp-tools-button-text-color: var(--bg);
+    --esp-tools-button-border-color: var(--primary);
+}
+
+.btn-install {
+    display: inline-block;
+    font-family: 'VT323', 'Courier New', monospace;
+    font-size: 32px;
+    color: var(--bg);
+    background: var(--primary);
+    border: 2px solid var(--accent);
+    padding: 16px 48px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.2s;
+    box-shadow:
+        0 0 20px var(--primary),
+        inset 0 0 10px rgba(255, 215, 0, 0.3);
+    text-shadow: 1px 1px 0 var(--accent);
+    letter-spacing: 2px;
+}
+
+.btn-install:hover {
+    background: var(--accent);
+    color: var(--bg);
+    transform: scale(1.05);
+    box-shadow:
+        0 0 30px var(--accent),
+        inset 0 0 15px rgba(255, 165, 0, 0.5);
+}
+
+.btn-install:active {
+    transform: scale(0.98);
+}
+
+.btn-install[disabled] {
+    background: #333;
+    color: #666;
+    border-color: #555;
+    cursor: not-allowed;
+    box-shadow: none;
+    text-shadow: none;
+}
+
+/* COMPATIBILITY NOTICE */
+.compat-notice {
+    margin-top: 16px;
+    color: var(--text-dim);
+    font-size: 18px;
+    text-align: center;
+}
+
+.compat-notice .browser-supported {
+    color: var(--green);
+}
+
+.compat-notice .browser-unsupported {
+    color: var(--red);
+}
+
+/* FOOTER */
+.footer-block {
+    border: 2px solid var(--border);
+    background: var(--bg-2);
+    padding: 20px;
+    margin-top: 24px;
+    text-align: center;
+}
+
+.dev-line {
+    color: var(--text);
+    font-size: 22px;
+    margin-bottom: 12px;
+}
+
+.dev-line a {
+    color: var(--accent);
+    text-decoration: none;
+    text-shadow: 0 0 5px var(--accent);
+}
+
+.dev-line a:hover {
+    color: var(--green);
+    text-shadow: 0 0 8px var(--green);
+}
+
+.social-links {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 20px;
+}
+
+.social-links a {
+    color: var(--cyan);
+    text-decoration: none;
+    border: 1px solid var(--cyan);
+    padding: 4px 12px;
+    transition: all 0.2s;
+}
+
+.social-links a:hover {
+    background: var(--cyan);
+    color: var(--bg);
+    box-shadow: 0 0 10px var(--cyan);
+}
+
+.tagline {
+    color: var(--primary);
+    font-size: 28px;
+    text-align: center;
+    margin: 24px 0;
+    letter-spacing: 4px;
+    text-shadow: 0 0 10px var(--primary);
+}
+
+.copyright {
+    text-align: center;
+    color: var(--text-dim);
+    font-size: 16px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+    h1.title { font-size: 40px; }
+    .subtitle { font-size: 18px; }
+    .terminal { padding: 20px 16px; }
+    .warnings .line { font-size: 18px; }
+    .btn-install { font-size: 24px; padding: 12px 32px; }
+    .topbar { font-size: 16px; }
+    .mascot { font-size: 10px; }
+}
+
+/* HIDE DOM elements based on language */
+.lang-en { display: none; }
+html[lang="en"] .lang-es { display: none; }
+html[lang="en"] .lang-en { display: inline; }
+html[lang="en"] .lang-en.block { display: block; }
+.lang-es.block { display: block; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- TOP BAR -->
+    <div class="topbar">
+        <span class="topbar-left">
+            <span class="lang-es">ESP32-TOOLS v2.0 | INSTALADOR WEB</span>
+            <span class="lang-en">ESP32-TOOLS v2.0 | WEB INSTALLER</span>
+        </span>
+        <button class="lang-toggle" onclick="toggleLang()">
+            <span class="lang-es">EN</span>
+            <span class="lang-en">ES</span>
+        </button>
+    </div>
+
+    <!-- TERMINAL PRINCIPAL -->
+    <div class="terminal">
+        <div class="terminal-prompt">
+            <span class="lang-es">TERMINAL v2.0</span>
+            <span class="lang-en">TERMINAL v2.0</span>
+        </div>
+
+        <h1 class="title">ESP32-TOOLS</h1>
+
+        <div class="subtitle">
+            <span class="lang-es">Multi-herramienta de seguridad WiFi + Bluetooth</span>
+            <span class="lang-en">WiFi + Bluetooth security multi-tool</span>
+        </div>
+
+        <!-- AJOLOTE ASCII ART -->
+<pre class="mascot">
+       _____
+      /     \
+     | () () |
+     |   ^   |
+      \  ~  /
+       =====
+      //   \\
+</pre>
+
+        <!-- INSTRUCCIONES (BILINGÜE) -->
+        <div class="warnings">
+
+            <!-- ESPAÑOL -->
+            <div class="lang-es">
+                <div class="line">
+                    <span class="bracket">[!]</span> CONECTA EL ESP32 VÍA USB
+                </div>
+                <div class="line">
+                    <span class="bracket">[!]</span> CIERRA VS CODE / MONITOR SERIE
+                </div>
+                <div class="line">
+                    <span class="bracket">[!]</span> SI EL FLASH FALLA: MANTÉN BOTÓN <strong>BOOT</strong>
+                </div>
+                <div class="line">
+                    <span class="bracket">[!]</span> USA CHROME / EDGE / OPERA EN ESCRITORIO
+                </div>
+            </div>
+
+            <!-- ENGLISH -->
+            <div class="lang-en">
+                <div class="line">
+                    <span class="bracket">[!]</span> CONNECT YOUR ESP32 VIA USB
+                </div>
+                <div class="line">
+                    <span class="bracket">[!]</span> CLOSE VS CODE / SERIAL MONITOR
+                </div>
+                <div class="line">
+                    <span class="bracket">[!]</span> IF FLASH FAILS: HOLD <strong>BOOT</strong> BUTTON
+                </div>
+                <div class="line">
+                    <span class="bracket">[!]</span> USE CHROME / EDGE / OPERA ON DESKTOP
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTÓN INSTALAR -->
+        <div class="install-section">
+            <esp-web-install-button manifest="manifest.json">
+                <button slot="activate" class="btn-install">
+                    <span class="lang-es">⚡ INSTALAR AHORA ⚡</span>
+                    <span class="lang-en">⚡ INSTALL NOW ⚡</span>
+                </button>
+                <span slot="unsupported" class="compat-notice browser-unsupported">
+                    <span class="lang-es">
+                        [X] NAVEGADOR NO COMPATIBLE<br>
+                        Usa Chrome, Edge u Opera en escritorio.
+                    </span>
+                    <span class="lang-en">
+                        [X] BROWSER NOT SUPPORTED<br>
+                        Use Chrome, Edge or Opera on desktop.
+                    </span>
+                </span>
+                <span slot="not-allowed" class="compat-notice browser-unsupported">
+                    <span class="lang-es">
+                        [X] PÁGINA NO SEGURA<br>
+                        El sitio debe servirse vía HTTPS.
+                    </span>
+                    <span class="lang-en">
+                        [X] PAGE NOT SECURE<br>
+                        Site must be served over HTTPS.
+                    </span>
+                </span>
+            </esp-web-install-button>
+        </div>
+
+    </div>
+
+    <!-- TAGLINE -->
+    <div class="tagline">
+        <span class="lang-es">— AUDITORÍA WIFI + BT —</span>
+        <span class="lang-en">— WIFI + BT AUDIT —</span>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer-block">
+        <div class="dev-line">
+            DEV: <a href="https://www.instagram.com/pepeangelll" target="_blank">pepeangell</a>
+        </div>
+
+        <div class="social-links">
+            <a href="https://www.instagram.com/pepeangelll" target="_blank">Instagram</a>
+            <a href="https://www.facebook.com/esp32tools/" target="_blank">Facebook</a>
+            <a href="https://github.com/pepeangell5/ESP32-TOOLS" target="_blank">GitHub</a>
+        </div>
+
+        <div class="copyright">
+            <span class="lang-es">Hecho con ❤️ y 🌶️ en Los Mochis, Sinaloa, México</span>
+            <span class="lang-en">Made with ❤️ and 🌶️ in Los Mochis, Sinaloa, México</span>
+        </div>
+    </div>
+
+</div>
+
+<script>
+function toggleLang() {
+    const html = document.documentElement;
+    const current = html.getAttribute('lang');
+    html.setAttribute('lang', current === 'es' ? 'en' : 'es');
+    // Persistir en localStorage
+    try {
+        localStorage.setItem('esp32tools_lang',
+            current === 'es' ? 'en' : 'es');
+    } catch (e) {}
+}
+
+// Cargar idioma guardado
+try {
+    const saved = localStorage.getItem('esp32tools_lang');
+    if (saved) {
+        document.documentElement.setAttribute('lang', saved);
+    } else {
+        // Auto-detectar idioma del navegador (default español)
+        const browserLang = (navigator.language || 'es').toLowerCase();
+        if (browserLang.startsWith('en')) {
+            document.documentElement.setAttribute('lang', 'en');
+        }
+    }
+} catch (e) {}
+</script>
+
+</body>
+</html>

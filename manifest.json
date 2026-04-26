@@ -1,0 +1,15 @@
+{
+  "name": "ESP32-TOOLS",
+  "version": "2.0",
+  "home_assistant_domain": "esp32tools",
+  "funding_url": "https://github.com/pepeangell5/ESP32-TOOLS",
+  "new_install_prompt_erase": true,
+  "builds": [
+    {
+      "chipFamily": "ESP32",
+      "parts": [
+        { "path": "firmware/firmware-merged.bin", "offset": 0 }
+      ]
+    }
+  ]
+}
