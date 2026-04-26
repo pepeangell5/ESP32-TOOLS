@@ -39,3 +39,6 @@ __pycache__/
 
 # Arduino compile
 build/
+# Permitir el binario mergeado para la página web
+!firmware/
+!firmware/firmware-merged.bin
