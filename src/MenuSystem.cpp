@@ -22,6 +22,8 @@
 #include "ProbeSniffer.h"
 #include "Karma.h"
 #include "ClockWeather.h"
+#include "About.h"
+#include "AjoloteSprite.h"
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  CARROUSEL PRINCIPAL
@@ -106,7 +108,8 @@ static void handlerSystem() {
     static const char* systemItems[] = {
         "Settings",
         "System Info",
-        "Clock & Weather"
+        "Clock & Weather",
+        "About"
     };
     static const int systemCount = sizeof(systemItems) / sizeof(char*);
 
@@ -118,6 +121,7 @@ static void handlerSystem() {
             case  0: runSettings();        break;
             case  1: runSystemInfo();      break;
             case  2: runClockWeather();    break;
+            case  3: runAbout();           break;
         }
     }
 }
