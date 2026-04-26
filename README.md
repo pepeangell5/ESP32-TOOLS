@@ -15,7 +15,7 @@
 ![Framework: Arduino](https://img.shields.io/badge/framework-Arduino-00979D.svg)
 ![Built with: PlatformIO](https://img.shields.io/badge/built%20with-PlatformIO-orange.svg)
 ![Version: 2.0](https://img.shields.io/badge/version-2.0-brightgreen.svg)
-
+[![Web Installer](https://img.shields.io/badge/⚡_FLASH_FROM_BROWSER-fa4500?style=for-the-badge)](https://pepeangell5.github.io/ESP32-TOOLS/)
 </div>
 
 ---
@@ -392,23 +392,50 @@ Batería 3.7V 1000mAh ──► TP4056 (carga USB) ──► Switch ──► St
 
 ---
 
-## 🚀 Instalación y compilación
+## 🚀 Instalación
 
-### Requisitos previos
+Hay dos formas de instalar ESP32-TOOLS en tu hardware:
+
+### ⚡ Opción 1 · Flasheo rápido desde el navegador (recomendado)
+
+Si solo quieres usar el firmware sin compilarlo, puedes flashearlo directamente desde tu navegador en menos de 1 minuto. **No necesitas instalar nada.**
+
+🔗 **[https://pepeangell5.github.io/ESP32-TOOLS/](https://pepeangell5.github.io/ESP32-TOOLS/)**
+
+**Pasos:**
+1. Abre el link en **Chrome, Edge u Opera** (en computadora — no funciona en móvil ni Firefox/Safari)
+2. Conecta tu ESP32 por USB
+3. Cierra cualquier programa que esté usando el puerto serie (VS Code, PuTTY, monitor serie)
+4. Click en **⚡ INSTALAR AHORA ⚡**
+5. Selecciona el puerto del ESP32 cuando te lo pida
+6. Espera ~30 segundos mientras se flashea
+7. ¡Listo! Reinicia el ESP32 y verás el splash del ajolote 🦎
+
+> **Si el flasheo falla:** mantén presionado el botón `BOOT` del ESP32 mientras le das click a "INSTALAR AHORA", y suéltalo cuando empiece a transferir.
+
+Esta opción ya incluye el patch del Deauther aplicado, por lo que **todas las herramientas funcionan out-of-the-box**.
+
+------------
+
+### 🛠️ Opción 2 · Compilar desde el código fuente
+
+Si quieres modificar el firmware, agregarle features o estudiar el código, esta es la ruta.
+
+#### Requisitos previos
 
 1. **VS Code** ([descargar](https://code.visualstudio.com/))
 2. **PlatformIO IDE** (extensión de VS Code — instalar desde el marketplace)
 3. **Python 3** (viene con PlatformIO)
 4. **Driver USB del ESP32** (CP210x o CH340 según tu módulo)
 
-### Clonar el repositorio
+#### Clonar el repositorio
 
 ```bash
 git clone https://github.com/pepeangell5/ESP32-TOOLS.git
 cd ESP32-TOOLS
 ```
 
-### Compilar y cargar
+#### Compilar y cargar
 
 Abre la carpeta en VS Code. PlatformIO detectará automáticamente el `platformio.ini`. Solo dale:
 
@@ -417,6 +444,8 @@ Abre la carpeta en VS Code. PlatformIO detectará automáticamente el `platformi
 3. **Upload** (→ en la barra inferior)
 
 El firmware se compilará (~3-5 minutos la primera vez por BLE + Evil Portal + ArduinoJson) y se cargará al ESP32.
+
+> **Importante:** si compilas desde fuente y vas a usar las herramientas Deauther o Evil Portal en modo CLONE+Deauth, primero tienes que aplicar el patch del SDK descrito más abajo.
 
 ### Primer arranque
 
