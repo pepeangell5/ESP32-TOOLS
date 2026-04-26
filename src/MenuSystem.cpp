@@ -20,6 +20,8 @@
 #include "EvilPortal.h"
 #include "Screensaver.h"
 #include "ProbeSniffer.h"
+#include "Karma.h"
+#include "ClockWeather.h"
 
 // ═══════════════════════════════════════════════════════════════════════════
 //  CARROUSEL PRINCIPAL
@@ -36,7 +38,8 @@ static void handlerWifi() {
         "Beacon Spam",
         "Deauther",
         "Evil Portal",
-        "Probe Sniffer"
+        "Probe Sniffer",
+        "KARMA Attack"
     };
     static const int wifiCount = sizeof(wifiItems) / sizeof(char*);
 
@@ -50,6 +53,7 @@ static void handlerWifi() {
             case  2: runDeauther();      break;
             case  3: runEvilPortal();    break;
             case  4: runProbeSniffer();  break;
+            case  5: runKarma();         break;
         }
     }
 }
@@ -101,7 +105,8 @@ static void handlerRadio() {
 static void handlerSystem() {
     static const char* systemItems[] = {
         "Settings",
-        "System Info"
+        "System Info",
+        "Clock & Weather"
     };
     static const int systemCount = sizeof(systemItems) / sizeof(char*);
 
@@ -109,9 +114,10 @@ static void handlerSystem() {
     while (!exitSub) {
         int choice = runSubMenu("SYSTEM", systemItems, systemCount);
         switch (choice) {
-            case -1: exitSub = true;      break;
-            case  0: runSettings();       break;
-            case  1: runSystemInfo();     break;
+            case -1: exitSub = true;       break;
+            case  0: runSettings();        break;
+            case  1: runSystemInfo();      break;
+            case  2: runClockWeather();    break;
         }
     }
 }
